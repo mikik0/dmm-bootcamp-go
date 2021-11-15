@@ -40,7 +40,11 @@ func (r *status) FindByID(ctx context.Context, id int64) (*object.Status, error)
 
 // CreateStatus : ステータスを作成
 func (r *status) CreateStatus(ctx context.Context, status *object.Status) error {
-	_, err := r.db.NamedExecContext(ctx, "insert into status (account_id, content, create_at) values (:account_id, :content, :created_at, :updated_at)", status)
+	fmt.Print("status.AccountID")
+	println(status.AccountID)
+	println("status.Content")
+	println(status.Content)
+	_, err := r.db.NamedExecContext(ctx, "insert into status (account_id, content) values (:account_id, :content)", status)
 	if err != nil {
 		return fmt.Errorf("%w", err)
 	}

@@ -40,6 +40,9 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	status.AccountID = 1
+	println("status.AccountID")
+	println(status.AccountID)
 	if err := statusRepo.CreateStatus(ctx, status); err != nil {
 		httperror.InternalServerError(w, err)
 		return

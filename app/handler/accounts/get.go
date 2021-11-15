@@ -31,8 +31,17 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	res := AddResponse{
+		Username:    user.Username,
+		DisplayName: user.DisplayName,
+		Avatar:      user.Avatar,
+		Header:      user.Header,
+		Note:        user.Note,
+		CreateAt:    user.CreateAt,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(&user); err != nil {
+	if err := json.NewEncoder(w).Encode(res); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}

@@ -15,6 +15,15 @@ type AddRequest struct {
 	Password string `json:"password"`
 }
 
+type AddResponse struct {
+	Username    string          `json:"username"`
+	DisplayName *string         `json:"display_name"`
+	Avatar      *string         `json:"avatar"`
+	Header      *string         `json:"header"`
+	Note        *string         `json:"note"`
+	CreateAt    object.DateTime `json:"create_at"`
+}
+
 // Handle request for `POST /v1/accounts`
 func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -34,24 +43,33 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 
 	accountRepo := h.app.Dao.Account() // domain/repository の取得
 
+	if err := accountRepo.CreateAccount(ctx, account); err != nil {
+		httperror.InternalServerError(w, err)
+		return
+	}
+
 	user, err := accountRepo.FindByUsername(ctx, account.Username)
 	if err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
 
-	if user != nil {
+	if user == nil {
 		httperror.BadRequest(w, errors.New("account name is already in use"))
 		return
 	}
 
-	if err := accountRepo.CreateAccount(ctx, account); err != nil {
-		httperror.InternalServerError(w, err)
-		return
+	res := AddResponse{
+		Username:    user.Username,
+		DisplayName: user.DisplayName,
+		Avatar:      user.Avatar,
+		Header:      user.Header,
+		Note:        user.Note,
+		CreateAt:    user.CreateAt,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(account); err != nil {
+	if err := json.NewEncoder(w).Encode(res); err != nil {
 		httperror.InternalServerError(w, err)
 		return
 	}
