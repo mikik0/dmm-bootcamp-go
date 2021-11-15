@@ -14,6 +14,8 @@ type (
 		// Get account repository
 		Account() repository.Account
 
+		Status() repository.Status
+
 		// Clear all data in DB
 		InitAll() error
 	}
@@ -38,9 +40,13 @@ func (d *dao) Account() repository.Account {
 	return NewAccount(d.db)
 }
 
+func (d *dao) Status() repository.Status {
+	return NewStatus(d.db)
+}
+
 func (d *dao) InitAll() error {
 	if err := d.exec("SET FOREIGN_KEY_CHECKS=0"); err != nil {
-		return fmt.Errorf("Can't disable FOREIGN_KEY_CHECKS: %w", err)
+		return fmt.Errorf("can't disable FOREIGN_KEY_CHECKS: %w", err)
 	}
 
 	defer func() {
